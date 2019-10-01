@@ -18,6 +18,8 @@ package com.example.heroku;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.jscience.physics.amount.Amount;
+import org.jscience.physics.model.RelativisticModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -26,6 +28,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.measure.quantity.Mass;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -33,6 +36,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Map;
+
+import static javax.measure.unit.SI.KILOGRAM;
 
 @Controller
 @SpringBootApplication
@@ -52,6 +57,22 @@ public class HerokuApplication {
   String index() {
     return "index";
   }
+
+
+  @RequestMapping("/hello")
+  String hello(Map<String, Object> model) {
+    RelativisticModel.select();
+    // TODO UTIL search
+    String energy = System.getenv().get("ENERGY");
+    if (energy == null) {
+      energy = "12 GeV";
+    }
+
+    Amount<Mass> m = Amount.valueOf("12 GeV").to(KILOGRAM);
+    model.put("science", "E=mc^2: " + energy + " = "  + m.toString());
+    return "hello";
+  }
+
 
   @RequestMapping("/db")
   String db(Map<String, Object> model) {
@@ -84,5 +105,9 @@ public class HerokuApplication {
       return new HikariDataSource(config);
     }
   }
+
+
+
+
 
 }
